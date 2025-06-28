@@ -11,6 +11,10 @@ pipeline {
 
   }
 
+   tools {
+      maven 'Maven-3.9.10'  // This name should match your Jenkins Maven installation
+    }
+
   stages {
 
     stage('Checkout') {
