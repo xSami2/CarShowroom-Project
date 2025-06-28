@@ -1,14 +1,5 @@
 pipeline {
-   agent {
-             // Use a Docker image that has Maven and Java pre-installed
-             // 'maven:3.9.6-eclipse-temurin-17' is a good choice for Maven 3.9.x and Java 17
-             docker {
-                 image 'maven:3.9.6-eclipse-temurin-17'
-                 // Optional: Mount the Maven local repository to speed up subsequent builds
-                 // This caches downloaded dependencies on the host or a shared volume
-                 args '-v $HOME/.m2:/root/.m2'
-             }
-         }
+  agent any
 
   environment {
     // Docker Image Name
