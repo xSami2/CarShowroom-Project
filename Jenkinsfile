@@ -38,7 +38,7 @@ pipeline {
             sh '''
               for i in {1..10}
               do
-                curl --fail http://localhost:8080/actuator/health && exit 0 || sleep 5
+                curl --fail http://localhost:9091 && exit 0 || sleep 5
               done
               echo "App is not healthy after waiting."
               exit 1
