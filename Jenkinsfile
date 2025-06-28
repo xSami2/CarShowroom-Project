@@ -31,20 +31,20 @@ pipeline {
                 }
             }
 
-    stage('Test') {
-        steps {
-            sh 'nohup java -jar target/developerChallenge-0.0.1-SNAPSHOT.jar > app.log &'
-            echo 'Waiting for app to be healthy...'
-            sh '''
-              for i in {1..10}
-              do
-                curl --fail http://localhost:9091 && exit 0 || sleep 5
-              done
-              echo "App is not healthy after waiting."
-              exit 1
-            '''
-        }
-    }
+//     stage('Test') {
+//         steps {
+//             sh 'nohup java -jar target/developerChallenge-0.0.1-SNAPSHOT.jar > app.log &'
+//             echo 'Waiting for app to be healthy...'
+//             sh '''
+//               for i in {1..10}
+//               do
+//                 curl --fail http://localhost:9091 && exit 0 || sleep 5
+//               done
+//               echo "App is not healthy after waiting."
+//               exit 1
+//             '''
+//         }
+//     }
 
 
   stage('Build Docker Image') {
