@@ -11,9 +11,7 @@ pipeline {
 
   }
 
-   tools {
-      maven 'Maven-3.9.10'  // This name should match your Jenkins Maven installation
-    }
+
 
   stages {
 
@@ -22,14 +20,6 @@ pipeline {
                    checkout scm
                }
            }
-
-     stage('Build') {
-                steps {
-                    echo 'Building the project with Maven...'
-                    // Run Maven clean package, skipping tests to speed up build
-                    sh " mvn clean package"
-                }
-            }
 
 //     stage('Test') {
 //         steps {
@@ -53,7 +43,7 @@ pipeline {
 
                       def branchTag = env.BRANCH_NAME ?: 'latest'
                           branchTag = branchTag.replaceAll('/', '-')
-                      echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:latest"
+                      echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}"
                       // Build the Docker image and tag it with registry URL and image name
                       def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}")
                           sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}"
