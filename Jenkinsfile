@@ -48,11 +48,11 @@ pipeline {
                                   case 'dev':
                                       imageTag = 'dev'
                                       break
-                                  case 'stag':
+                                  case 'staging':
                                       imageTag = 'staging'
                                       break
-                                  case 'prod':
-                                      imageTag = 'latest'
+                                  case 'main':
+                                      imageTag = 'production'
                                       break
                                   default:
                                       imageTag = 'unknown'
