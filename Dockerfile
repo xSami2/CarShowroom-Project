@@ -1,14 +1,14 @@
-# Use OpenJDK as base image
-FROM openjdk:17-jdk-slim
-
-# Set working directory
+# Build stage
+FROM openjdk:17-jdk-slim AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN apt-get update && apt-get install -y maven
+RUN mvn clean package -DskipTests
 
-# Copy jar (replace with your real jar name or use target/*.jar)
-COPY target/*.jar app.jar
-
-# Expose port (adjust if different)
+# Runtime stage
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 9020
-
-# Run the jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
