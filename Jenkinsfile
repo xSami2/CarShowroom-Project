@@ -61,11 +61,8 @@ pipeline {
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
                                 def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}")
-                                docker.push
+                                    appImage.push()
 
-                      // Build the Docker image and tag it with registry URL and image name
-                      def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}")
-                        appImage.push()
 
 
                   }
