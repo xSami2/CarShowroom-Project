@@ -41,12 +41,31 @@ pipeline {
               steps {
                   script {
 
-                      def branchTag = env.BRANCH_NAME ?: 'latest'
-                          branchTag = branchTag.replaceAll('/', '-')
-                      echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}"
+                   def imageTag
+
+                              // Determine tag based on branch
+                              switch(env.BRANCH_NAME) {
+                                  case 'dev':
+                                      imageTag = 'dev'
+                                      break
+                                  case 'stag':
+                                      imageTag = 'staging'
+                                      break
+                                  case 'prod':
+                                      imageTag = 'latest'
+                                      break
+                                  default:
+                                      imageTag = 'unknown'
+                                      echo "Warning: Unknown branch ${env.BRANCH_NAME}, using 'unknown' tag"
+                              }
+
+                                echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
+                                def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}")
+                                docker.push
+
                       // Build the Docker image and tag it with registry URL and image name
                       def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}")
-                          sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:${branchTag}"
+                        appImage.push()
 
 
                   }
