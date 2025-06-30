@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     // Docker Image Name
-    IMAGE_NAME = 'CarShowroom-project'
+    IMAGE_NAME = 'carshowroom-project'
     // Docker Registry URL ( Infrabase Server)
     REGISTRY = '192.168.100.16:5000'
     // Full image name combining registry and image name
