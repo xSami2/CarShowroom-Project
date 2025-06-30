@@ -1,3 +1,21 @@
+def deployToEnvironment(environment, composeFileName, imageTag = null , machineIpAddress) {
+    try {
+        if (imageTag) {
+            echo "Deploying to ${environment} with tag: ${imageTag}"
+        }
+        sh """
+            ssh ${machineIpAddress} '
+                cd carshowroom/ &&
+                docker compose -f ${composeFileName} down --remove-orphans &&
+                docker compose -f ${composeFileName} up -d
+            '
+        """
+        echo "Successfully deployed to ${environment} environment"
+    } catch (Exception e) {
+        error "Failed to deploy to ${environment} environment: ${e.getMessage()}"
+    }
+}
+
 pipeline {
   agent any
 
@@ -8,7 +26,9 @@ pipeline {
     REGISTRY = '192.168.100.16:5000'
     // Full image name combining registry and image name
     FULL_IMAGE_NAME = "${REGISTRY}/${IMAGE_NAME}"
-
+     devServer = 'sami@192.168.100.17'
+     stagingServer = 'sami@192.168.100.18'
+     prodServer = 'sami@192.168.100.19'
   }
 
 
@@ -55,8 +75,8 @@ pipeline {
                                       imageTag = 'production'
                                       break
                                   default:
-                                      imageTag = 'unknown'
-                                      echo "Warning: Unknown branch ${env.BRANCH_NAME}, using 'unknown' tag"
+                                      imageTag = BRANCH_NAME
+                                      echo "Warning: Unknown branch ${env.BRANCH_NAME}, using '${BRANCH_NAME}' tag"
                               }
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
@@ -72,6 +92,26 @@ pipeline {
     stage('Deploy') {
       steps {
         sh 'echo "Deploy script here depending on branch and env"'
+        script{
+          switch(env.BRANCH_NAME) {
+              case 'dev':
+                  imageTag = 'dev'
+                  deployToEnvironment('dev', 'docker-compose.qa.yaml' , imageTag , env.devServer)
+                  break
+              case 'staging':
+                  imageTag = 'staging'
+                  deployToEnvironment('staging', 'docker-compose.staging.yaml', imageTag , env.stagingServer)
+                  break
+              case 'main':
+                  imageTag = 'production'
+                  deployToEnvironment('production', 'docker-compose.prod.yaml', imageTag , env.prodServer)
+                  break
+              default:
+                  imageTag = BRANCH_NAME
+                  echo "Warning: Unknown branch ${env.BRANCH_NAME}, using '${BRANCH_NAME}' tag"
+                  echo "No deployment configured for branch: ${env.BRANCH_NAME}"
+          }
+        }
       }
     }
   }
