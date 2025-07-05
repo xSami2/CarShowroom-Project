@@ -4,7 +4,7 @@ def deployToEnvironment(environment, composeFileName, imageTag = null , machineI
             echo "Deploying to ${environment} with tag: ${imageTag}"
         }
         sh """
-           sshpass -p '${password}' ssh -o StrictHostKeyChecking=no ${machineIpAddress} '
+          ssh -o StrictHostKeyChecking=no ${machineIpAddress} '
                 cd carshowroom/ &&
                 docker compose -f ${composeFileName} down --remove-orphans &&
                 docker compose -f ${composeFileName} up -d
@@ -26,9 +26,9 @@ pipeline {
     REGISTRY = '192.168.100.16:5000'
     // Full image name combining registry and image name
     FULL_IMAGE_NAME = "${REGISTRY}/${IMAGE_NAME}"
-     devServer = 'sami@192.168.100.17'
-     stagingServer = 'sami@192.168.100.18'
-     prodServer = 'sami@192.168.100.19'
+    DEV_SERVER = 'sami@192.168.100.17'
+    STAGING_SERVER = 'sami@192.168.100.18'
+    PROD_SERVER = 'sami@192.168.100.19'
   }
 
 
@@ -98,15 +98,15 @@ pipeline {
           switch(env.BRANCH_NAME) {
               case 'dev':
                   imageTag = 'dev'
-                  deployToEnvironment('dev', 'docker-compose.qa.yaml' , imageTag , env.devServer , QA_SSH_PASS)
+                  deployToEnvironment('dev', 'docker-compose.qa.yaml' , imageTag , env.DEV_SERVER , QA_SSH_PASS)
                   break
               case 'staging':
                   imageTag = 'staging'
-                  deployToEnvironment('staging', 'docker-compose.staging.yaml', imageTag , env.stagingServer)
+                  deployToEnvironment('staging', 'docker-compose.staging.yaml', imageTag , env.STAGING_SERVER)
                   break
               case 'main':
                   imageTag = 'production'
-                  deployToEnvironment('production', 'docker-compose.prod.yaml', imageTag , env.prodServer)
+                  deployToEnvironment('production', 'docker-compose.prod.yaml', imageTag , env.PROD_SERVER)
                   break
               default:
                   imageTag = BRANCH_NAME
