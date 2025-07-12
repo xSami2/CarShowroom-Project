@@ -80,9 +80,8 @@ pipeline {
                               }
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
-
-                                               sh "docker build -t ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag} ."
-                                               sh "docker push ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
+                                def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}")
+                                    appImage.push()
 
 
 
