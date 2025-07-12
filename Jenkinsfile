@@ -88,8 +88,13 @@ pipeline {
                               }
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
-                                def appImage = docker.build("${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}")
-                                    appImage.push()
+
+                        sh """
+                        ./mvnw jib:build \
+                        -Djib.to.image=${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag} \
+                        -Djib.allowInsecureRegistries=true \
+                         -Djib.to.tags=${imageTag},latest
+                     """
 
 
 
