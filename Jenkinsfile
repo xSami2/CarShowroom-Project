@@ -39,6 +39,10 @@ pipeline {
     PROD_SERVER = 'sami@192.168.100.19'
   }
 
+  tools {
+          maven 'Maven-3.9.10'  // matches the name you chose above
+      }
+
 
 
   stages {
@@ -88,7 +92,7 @@ pipeline {
                               }
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
-                                  sh "/usr/share/maven/bin/mvn clean package -Djib.to.tags=${imageTag},latest"
+                                  sh "mvn  clean package -Djib.to.tags=${imageTag},latest"
 
 
 
