@@ -88,7 +88,7 @@ pipeline {
                               }
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
-                                  sh "/usr/bin/mvn clean package -Djib.to.tags=${imageTag},latest"
+                                  sh "/usr/share/maven/bin/mvn clean package -Djib.to.tags=${imageTag},latest"
 
 
 
