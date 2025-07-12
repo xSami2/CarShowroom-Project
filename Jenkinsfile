@@ -1,15 +1,23 @@
-def deployToEnvironment(environment, composeFileName, imageTag = null , machineIpAddress) {
+def deployToEnvironment(environment, composeFileName, imageTag = null , machineIpAddress,  sshCredentialId) {
     try {
         if (imageTag) {
             echo "Deploying to ${environment} with tag: ${imageTag}"
         }
-        sh """
-          ssh  ${machineIpAddress} '
-                cd carshowroom/ &&
-                docker compose -f ${composeFileName} down --remove-orphans &&
-                docker compose -f ${composeFileName} up -d
-            '
-        """
+       sshagent([sshCredentialId]) {
+                   sh """
+                       ssh -o StrictHostKeyChecking=no ${machineIpAddress} '
+                           cd carshowroom/ &&
+                           echo "🛑 Stopping existing containers..." &&
+                           docker compose -f ${composeFileName} down --remove-orphans &&
+                           echo "📥 Pulling latest images..." &&
+                           docker compose -f ${composeFileName} pull &&
+                           echo "🚀 Starting new containers..." &&
+                           docker compose -f ${composeFileName} up -d &&
+                           echo "🔍 Checking container status..." &&
+                           docker compose -f ${composeFileName} ps
+                       '
+                   """
+               }
         echo "Successfully deployed to ${environment} environment"
     } catch (Exception e) {
         error "Failed to deploy to ${environment} environment: ${e.getMessage()}"
@@ -98,15 +106,15 @@ pipeline {
           switch(env.BRANCH_NAME) {
               case 'dev':
                   imageTag = 'dev'
-                  deployToEnvironment('dev', 'docker-compose.qa.yaml' , imageTag , env.DEV_SERVER , QA_SSH_PASS)
+                  deployToEnvironment('dev', 'docker-compose.qa.yaml' , imageTag , env.DEV_SERVER , "qa-ssh-key")
                   break
               case 'staging':
                   imageTag = 'staging'
-                  deployToEnvironment('staging', 'docker-compose.staging.yaml', imageTag , env.STAGING_SERVER)
+                  deployToEnvironment('staging', 'docker-compose.staging.yaml', imageTag , env.STAGING_SERVER , "staging-ssh-key")
                   break
               case 'main':
                   imageTag = 'production'
-                  deployToEnvironment('production', 'docker-compose.prod.yaml', imageTag , env.PROD_SERVER)
+                  deployToEnvironment('production', 'docker-compose.prod.yaml', imageTag , env.PROD_SERVER , "prod-ssh-key")
                   break
               default:
                   imageTag = BRANCH_NAME
