@@ -1,10 +1,10 @@
-def deployToEnvironment(environment, composeFileName, imageTag = null , machineIpAddress , password) {
+def deployToEnvironment(environment, composeFileName, imageTag = null , machineIpAddress) {
     try {
         if (imageTag) {
             echo "Deploying to ${environment} with tag: ${imageTag}"
         }
         sh """
-          ssh -o StrictHostKeyChecking=no ${machineIpAddress} '
+          ssh  ${machineIpAddress} '
                 cd carshowroom/ &&
                 docker compose -f ${composeFileName} down --remove-orphans &&
                 docker compose -f ${composeFileName} up -d
@@ -94,7 +94,7 @@ pipeline {
         sh 'echo "Deploy script here depending on branch and env"'
         script{
 
-            QA_SSH_PASS = credentials('qa-ssh-password') // 👈 inject the password here
+
           switch(env.BRANCH_NAME) {
               case 'dev':
                   imageTag = 'dev'
