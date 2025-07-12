@@ -89,12 +89,13 @@ pipeline {
 
                                 echo "Building Docker image ${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag}"
 
-                        sh """
-                            mvn jib:build \
-                            -Djib.to.image=${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag} \
-                            -Djib.allowInsecureRegistries=true \
-                            -Djib.to.tags=${imageTag},latest
-                        """
+                      sh """
+                          chmod +x ./mvnw
+                          ./mvnw jib:build \
+                          -Djib.to.image=${env.REGISTRY}/${env.IMAGE_NAME}:${imageTag} \
+                          -Djib.allowInsecureRegistries=true \
+                          -Djib.to.tags=${imageTag},latest
+                      """
 
 
 
