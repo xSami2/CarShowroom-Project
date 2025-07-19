@@ -4,7 +4,7 @@ services:
     image: 192.168.100.16:5000/carshowroom-project
     container_name: carshowroom_app_dev
     ports:
-      - "9091:9091"  # Adjust port based on your app
+      - "9091:9091" 
     environment:
       - DATABASE_URL=postgresql://admin:admin@postgres_db:5432/carshowroom_dev
       - ENVIRONMENT=development
